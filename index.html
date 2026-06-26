@@ -97,24 +97,26 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 15px;
+            padding: 8px 10px;
             color: white;
             border-radius: 8px;
+            border: none;
+            cursor: pointer;
         }
 
         .btn-green { background-color: var(--green); }
         .btn-red { background-color: var(--red); }
-        .btn-single { grid-column: span 2; background-color: #9b59b6; }
+        .btn-single { grid-column: span 2; background-color: #9b59b6; padding: 12px 15px; }
         .btn-ped { background-color: #f39c12; }
 
         .counter-val {
-            font-size: 1.8rem;
+            font-size: 1.4rem;
             font-weight: bold;
-            margin-top: 5px;
+            margin-top: 2px;
         }
 
         .label {
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             text-align: center;
@@ -227,7 +229,6 @@
     let totalSeconds = 1800; // 30 minutes
     let isRunning = false;
     
-    // Arrays tracking when photo notifications have fired to prevent duplicates (at 20m and 10m remaining)
     const photoReminders = {
         20: false,
         10: false
@@ -273,7 +274,6 @@
             timerDisplay.textContent = 
                 (mins < 10 ? "0" : "") + mins + ":" + (secs < 10 ? "0" : "") + secs;
 
-            // Photo reminder check every 10 minutes elapsed (20 mins left, 10 mins left)
             if ((mins === 20 || mins === 10) && secs === 0) {
                 if (!photoReminders[mins]) {
                     photoReminders[mins] = true;
