@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traffic Observation Tracker</title>
+    <style>
+        :root {
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --green: #2ecc71;
+            --red: #e74c3c;
+            --blue: #3498db;
+            --border-radius: 12px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .timer-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .time-display {
+            font-size: 3rem;
+            font-weight: bold;
+            font-variant-numeric: tabular-nums;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            font-size: 1rem;
+            font-weight: bold;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn:active {
+            opacity: 0.7;
+        }
+
+        .btn-start { background-color: var(--blue); color: white; width: 100%; }
+        .btn-stop { background-color: #7f8c8d; color: white; width: 100%; }
+
+        .category-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .category-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 12px;
+            border-bottom: 2px solid var(--bg-color);
+            padding-bottom: 5px;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn-action {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            color: white;
+            border-radius: 8px;
+        }
+
+        .btn-green { background-color: var(--green); }
+        .btn-red { background-color: var(--red); }
+        .btn-single { grid-column: span 2; background-color: #9b59b6; }
+        .btn-ped { background-color: #f39c12; }
+
+        .counter-val {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+
+        .disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .export-section {
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .btn-export {
+            background-color: #2c3e50;
+            color: white;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Rush Hour Behaviour Tracker</h1>
+
+    <div class="timer-card">
+        <div class="time-display" id="timerDisplay">30:00</div>
+        <button class="btn btn-start" id="timerBtn">Start 30 Min Timer</button>
+    </div>
+
+    <div id="counterControls" class="disabled">
+        
+        <div class="category-card">
+            <div class="category-title">Cyclists</div>
+            <div class="button-group">
+                <button class="btn btn-action btn-green" onclick="increment('cyclist_obey')">
+                    <span class="label">Obeyed Red</span>
+                    <span class="counter-val" id="cyclist_obey">0</span>
+                </button>
+                <button class="btn btn-action btn-red" onclick="increment('cyclist_run')">
+                    <span class="label">Ran Red</span>
+                    <span class="counter-val" id="cyclist_run">0</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="category-card">
+            <div class="category-title">Delivery Riders / Mopeds</div>
+            <div class="button-group">
+                <button class="btn btn-action btn-green" onclick="increment('moped_obey')">
+                    <span class="label">Obeyed Red</span>
+                    <span class="counter-val" id="moped_obey">0</span>
+                </button>
+                <button class="btn btn-action btn-red" onclick="increment('moped_run')">
+                    <span class="label">Ran Red</span>
+                    <span class="counter-val" id="moped_run">0</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="category-card">
+            <div class="category-title">e-Bikes & e-Scooters</div>
+            <div class="button-group">
+                <button class="btn btn-action btn-green" onclick="increment('ebike_obey')">
+                    <span class="label">Obeyed Red</span>
+                    <span class="counter-val" id="ebike_obey">0</span>
+                </button>
+                <button class="btn btn-action btn-red" onclick="increment('ebike_run')">
+                    <span class="label">Ran Red</span>
+                    <span class="counter-val" id="ebike_run">0</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="category-card">
+            <div class="category-title">Pedestrians Crossing</div>
+            <div class="button-group">
+                <button class="btn btn-action btn-green" onclick="increment('ped_normal')">
+                    <span class="label">Crossed (Normal)</span>
+                    <span class="counter-val" id="ped_normal">0</span>
+                </button>
+                <button class="btn btn-action btn-red" onclick="increment('ped_illegal')">
+                    <span class="label">Crossed on Green (Illegal)</span>
+                    <span class="counter-val" id="ped_illegal">0</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="category-card">
+            <div class="category-title">Conflicts</div>
+            <div class="button-group">
+                <button class="btn btn-action btn-single btn-ped" onclick="increment('negative_interaction')">
+                    <span class="label">Pedestrian & Cyclist Negative Interaction</span>
+                    <span class="counter-val" id="negative_interaction">0</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="export-section">
+            <button class="btn btn-export" onclick="exportDataToTxt()">Download Data .txt File</button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    let timer;
+    let totalSeconds = 1800; // 30 minutes
+    let isRunning = false;
+    
+    // Arrays tracking when photo notifications have fired to prevent duplicates (at 20m and 10m remaining)
+    const photoReminders = {
+        20: false,
+        10: false
+    };
+
+    const data = {
+        cyclist_obey: 0, cyclist_run: 0,
+        moped_obey: 0, moped_run: 0,
+        ebike_obey: 0, ebike_run: 0,
+        ped_normal: 0, ped_illegal: 0,
+        negative_interaction: 0
+    };
+
+    const timerBtn = document.getElementById('timerBtn');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const counterControls = document.getElementById('counterControls');
+
+    timerBtn.addEventListener('click', function() {
+        if (!isRunning) {
+            startTimer();
+        } else {
+            stopTimer();
+        }
+    });
+
+    function startTimer() {
+        isRunning = true;
+        timerBtn.textContent = "Pause Timer";
+        timerBtn.className = "btn btn-stop";
+        counterControls.classList.remove('disabled');
+
+        timer = setInterval(function() {
+            if (totalSeconds <= 0) {
+                clearInterval(timer);
+                timerDisplay.textContent = "00:00";
+                alert("Observation time finished! Please download your text file report.");
+                stopTimer();
+                return;
+            }
+            totalSeconds--;
+            let mins = Math.floor(totalSeconds / 60);
+            let secs = totalSeconds % 60;
+            timerDisplay.textContent = 
+                (mins < 10 ? "0" : "") + mins + ":" + (secs < 10 ? "0" : "") + secs;
+
+            // Photo reminder check every 10 minutes elapsed (20 mins left, 10 mins left)
+            if ((mins === 20 || mins === 10) && secs === 0) {
+                if (!photoReminders[mins]) {
+                    photoReminders[mins] = true;
+                    if (navigator.vibrate) {
+                        navigator.vibrate([200, 100, 200]);
+                    }
+                    alert(`🚨 10-Minute Reminder: Take a photo of the location!`);
+                }
+            }
+        }, 1000);
+    }
+
+    function stopTimer() {
+        isRunning = false;
+        clearInterval(timer);
+        timerBtn.textContent = "Resume 30 Min Timer";
+        timerBtn.className = "btn btn-start";
+    }
+
+    function increment(key) {
+        data[key]++;
+        document.getElementById(key).textContent = data[key];
+        
+        if (navigator.vibrate) {
+            navigator.vibrate(50);
+        }
+    }
+
+    function generateSummaryString() {
+        return `--- RUSH HOUR OBSERVATION DATA ---
+Generated: ${new Date().toLocaleString()}
+Remaining Time: ${timerDisplay.textContent}
+
+[CYCLISTS]
+Obeyed Red Light: ${data.cyclist_obey}
+Ran Red Light:    ${data.cyclist_run}
+
+[DELIVERY RIDERS / MOPEDS]
+Obeyed Red Light: ${data.moped_obey}
+Ran Red Light:    ${data.moped_run}
+
+[E-BIKES & E-SCOOTERS]
+Obeyed Red Light: ${data.ebike_obey}
+Ran Red Light:    ${data.ebike_run}
+
+[PEDESTRIANS]
+Crossed at Traffic Lights:       ${data.ped_normal}
+Crossed on Green (When shouldn't): ${data.ped_illegal}
+
+[CONFLICTS]
+Pedestrian & Cyclist Negative Interactions: ${data.negative_interaction}
+`;
+    }
+
+    function exportDataToTxt() {
+        const textContent = generateSummaryString();
+        const blob = new Blob([textContent], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `Traffic_Observation_Report_${new Date().toISOString().slice(0,10)}.txt`;
+        
+        document.body.appendChild(link);
+        link.click();
+        
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+</script>
+
+</body>
+</html>
